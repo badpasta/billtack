@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from typing import Optional, Self, TypeVar
 
 from logging import debug as log_debug

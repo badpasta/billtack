@@ -95,7 +95,11 @@ if __name__ == '__main__':
     config.init()
     
     from billtack.utils.config import CONF
-    log.init(logging.INFO)
+    log.init(logging.DEBUG)
+    
+    log_debug(CONF.bill.trade_classify)
+    log_debug(CONF.bill.bank_account)
+    
     
     #test_read_xls()
     #test_read_csv()

@@ -4,6 +4,7 @@ from typing import Optional, Self, TypeVar
 
 from logging import debug as log_debug
 from json import loads as json_loads
+from re import search as re_search
 
 from .config import CONF
 from .file import load_file
@@ -33,7 +34,7 @@ class BillEntry(object):
         
         kwargs.update(classify_dict)
         
-        kwargs.update(self.bank_type(kwargs))
+        kwargs.update(self.get_bank_type(kwargs))
         
         log_debug(f"kwargs: {kwargs}")
         
@@ -76,20 +77,24 @@ class BillEntry(object):
         
         return classify_result
         
-    def bank_type(self, entry: dict) -> dict:
-        account_mapping = {
-            '现金': ['现金'],
-            '信用卡': ['浦发银行(0895)', '浦发银行信用卡(0895)', '招商银行信用卡(9632)'],
-            '储蓄卡': ['招商银行(5237)', '招商银行储蓄卡(5237)'],
-            '微信': ['零钱', '/', '零钱通'],
-            '支付宝': ['余额宝', '余额']
-        }
+    def get_bank_type(self, entry: dict) -> dict:
+        
+        _bank = load_file(CONF.bill.bank_account)
+        
+        bank_mapping = json_loads(_bank)
+
         
         bank_account = entry['bank_account']
+       
+        _account = bank_account
+        filed = re_search(r'\((\d+)\)', bank_account)
+        if filed:
+            _account = filed[0]
         
-        for key, value in account_mapping.items():
-            if bank_account in value:
-                return {'bank_type': key}  
+        for key, value in bank_mapping.items():
+            for v in value:
+                if _account in v:
+                    return {'bank_type': key, 'bank_account': v}  
         
         log_debug(f"entry: {entry}")   
         raise ValueError(f'bank_account: {bank_account} is not in account_mapping')      

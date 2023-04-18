@@ -21,6 +21,7 @@ database_opts = [
 
 bill_opts = [
     cfg.StrOpt('trade_classify', default=''),
+    cfg.StrOpt('bank_account', default=''),
 ]
 
 groups = {

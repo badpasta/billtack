@@ -127,9 +127,21 @@ class BillEntry(object):
         return self.__dict__
     
     def values(self) -> list:
-        return list(self.__dict__.values())
+        keys = self.header_filed.keys()
+        
+        """通过keys取出self.__dict__中的value"""
+        return [self.__dict__[key] for key in keys]
+        
     
+    @property
+    def file_type(self) -> str: ...
+   
+    @property
     def headers(self) -> list: ...
+    
+    @property
+    def header_filed(self) -> dict: ...
+
 
 
 class SuishoujiBillEntry(BillEntry): 
@@ -181,7 +193,23 @@ class SuishoujiBillEntry(BillEntry):
    
     @property 
     def headers(self) -> list:
-        return ['币种', '日期', '商家', '交易类型', '金额', '账户2', '备注', 'source', '分类', '子分类', '账户1']
+        return self.header_filed.values()
+   
+    @property 
+    def header_filed(self) -> dict: 
+        
+        return {
+            "date": "日期",
+            "trade_type": "交易类型",
+            "merchant": "商家",
+            "payout": "金额",
+            "bank_account": "账户1",
+            "comment": "备注",
+            "classify": "分类",
+            "l2_classify": "子分类",
+            "bank_type": "账户2",
+        }
+
 
         
 class Ledger(object):

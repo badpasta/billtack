@@ -21,10 +21,11 @@ class BillEntry(object):
     #pay_owner: str  # 支付人
     merchant: str   # 商户, 例如: 京东, 淘宝, 微信支付
     comment: str    # 备注
-    currency: str = 'CNY'
+    currency: str
     source: str # 来源, 例如: wechat, alipay, bank, cash
     
     def __init__(self, **kwargs) -> None:
+        self.currency = 'CNY'
         
         assert 'merchant' in kwargs, 'merchant is None'
         
@@ -122,6 +123,8 @@ class BillEntry(object):
     
     def values(self) -> list:
         return list(self.__dict__.values())
+    
+    def headers(self) -> list: ...
 
 
 class SuishoujiBillEntry(BillEntry): 
@@ -173,13 +176,14 @@ class SuishoujiBillEntry(BillEntry):
    
     @property 
     def headers(self) -> list:
-        return ['日期', '商家', '交易类型', '金额', '账户2', '备注', 'source', '分类', '子分类', '账户1']
+        return ['币种', '日期', '商家', '交易类型', '金额', '账户2', '备注', 'source', '分类', '子分类', '账户1']
 
         
 class Ledger(object):
     """账单类"""
-    entries: list = []
+    entries: list
     def __init__(self, entries: Optional[list] = None) -> None:
+        self.entries = list()
         if entries is not None:
             self.entries = entries
             

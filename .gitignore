@@ -40,3 +40,6 @@ logs/
 # TMP File
 tmp/
 
+# Data File
+datas/
+

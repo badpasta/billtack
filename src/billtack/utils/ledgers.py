@@ -27,17 +27,17 @@ class BillEntry(object):
     
     def __init__(self, **kwargs) -> None:
         self.currency = 'CNY'
-        
+
         assert 'merchant' in kwargs, 'merchant is None'
-        
+
         classify_dict = self.trade_classify(kwargs['merchant'])
-        
-        kwargs.update(classify_dict)
-        
+
+        kwargs |= classify_dict
+
         kwargs.update(self.get_bank_type(kwargs))
-        
+
         log_debug(f"kwargs: {kwargs}")
-        
+
         for key, value in kwargs.items():
             if key in self.__annotations__:
                 setattr(self, key, value)
@@ -80,23 +80,22 @@ class BillEntry(object):
     def get_bank_type(self, entry: dict) -> dict:
         
         _bank = load_file(CONF.bill.bank_account)
-        
+
         bank_mapping = json_loads(_bank)
 
-        
+
         bank_account = entry['bank_account']
-       
+
         _account = bank_account
-        filed = re_search(r'\((\d+)\)', bank_account)
-        if filed:
+        if filed := re_search(r'\((\d+)\)', bank_account):
             _account = filed[0]
-        
+
         for key, value in bank_mapping.items():
             for v in value:
                 if _account in v:
                     return {'bank_type': key, 'bank_account': v}  
-        
-        log_debug(f"entry: {entry}")   
+
+        log_debug(f"entry: {entry}")
         raise ValueError(f'bank_account: {bank_account} is not in account_mapping')      
         
         
@@ -110,11 +109,11 @@ class BillEntry(object):
     @classmethod
     def parse_bill(cls, entry: dict, key_mapping: dict) -> Self:
        
-        keywords = dict()
-        for key, value in entry.items():
-            if key in key_mapping:
-                keywords.update({key_mapping[key]: value})
-                
+        keywords = {
+            key_mapping[key]: value
+            for key, value in entry.items()
+            if key in key_mapping
+        }
         return cls(**keywords)
     
     def __str__(self) -> str:
@@ -216,7 +215,7 @@ class Ledger(object):
     """账单类"""
     entries: list
     def __init__(self, entries: Optional[list] = None) -> None:
-        self.entries = list()
+        self.entries = []
         if entries is not None:
             self.entries = entries
             

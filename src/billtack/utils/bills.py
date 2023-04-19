@@ -90,10 +90,8 @@ class WechatBillFactory(BillFactory):
         """解析原始账单, 格式化为标准账单"""
        
         log_debug(meta_bill.keys())
-        meta_bill.update({
-            "source": "wechat",
-        })
-        
+        meta_bill["source"] = "wechat"
+
         return self.entry_cls.parse_wechat_bill(meta_bill)
         
     
@@ -106,11 +104,11 @@ class AlipayBillFactory(BillFactory):
     def _parse_meta_bill(self, meta_bill: list[dict]) -> list[dict]:
         """解析原始账单, 格式化为标准账单"""
         
-   
+       
         log_debug(meta_bill.keys())
-        
+
         def _replace(value):
-            
+
             value = value.replace('\t', '')
             """去掉value末尾的空格"""
             value = value.rstrip()
@@ -118,15 +116,13 @@ class AlipayBillFactory(BillFactory):
             return value
 
         _bill = {}            
-        
+
         for k, v in meta_bill.items():
             _bill[_replace(k)] = _replace(v)
-        
+
         log_debug(f"_bill: {_bill}")
-        _bill.update({
-            "source": "alipay",
-        })
-     
+        _bill["source"] = "alipay"
+
         return self.entry_cls.parse_alipay_bill(_bill)
 
 
